@@ -5,7 +5,6 @@
     --bg-surface: #0d1124;
     --v-cyan: #00f2ff;
     --v-blue: #0066ff;
-    --v-glass: rgba(0, 242, 255, 0.05);
     --text: #e6f5ff;
     --text-muted: #8a9aa8;
     --font-tech: 'Rajdhani', sans-serif;
@@ -25,7 +24,7 @@ body {
 /* --- HEADER --- */
 header {
     background: white;
-    padding: 10px 40px;
+    padding: 10px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -52,18 +51,12 @@ header {
     color: var(--v-blue);
     text-decoration: none;
     margin-left: 10px;
-    transition: 0.3s;
-}
-
-.author-link:hover {
-    color: var(--v-cyan);
-    text-shadow: 0 0 8px var(--v-cyan);
 }
 
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .btn-action {
@@ -73,26 +66,37 @@ header {
     font-weight: 700;
     text-transform: uppercase;
     transition: 0.2s;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .btn-action.main {
     background: linear-gradient(135deg, var(--v-blue), #003a99);
     color: white;
-    padding: 10px 25px;
+    padding: 10px 20px;
     clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
 }
 
 .btn-action.sub {
     background: #eef4f8;
     color: #002d55;
-    padding: 8px 15px;
+    padding: 8px 12px;
     border-radius: 2px;
     border: 1px solid #d0deea;
-    margin-left: 5px;
 }
 
-/* --- CONTENEDOR DE JUGADORES --- */
+.btn-action.sub:hover {
+    background: var(--v-cyan);
+    border-color: var(--v-blue);
+}
+
+.sep {
+    width: 1px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 0 2px;
+}
+
+/* --- CONTENEDOR DE JUGADORES (Altura Fija) --- */
 #player-row-container {
     background: var(--bg-surface);
     border: 1px solid rgba(0, 242, 255, 0.1);
@@ -111,7 +115,6 @@ header {
     font-size: 1.3rem;
     color: var(--v-cyan);
     margin-bottom: 10px;
-    letter-spacing: 2px;
     text-align: center;
 }
 
@@ -123,7 +126,7 @@ header {
     flex-grow: 1;
 }
 
-/* --- ANIMACIÓN DE APARICIÓN DE TARJETAS --- */
+/* --- TARJETA DE JUGADOR --- */
 @keyframes cardEntrance {
     from {
         opacity: 0;
@@ -139,18 +142,16 @@ header {
 .player-card {
     background: #0a0e1a;
     border: 1px solid rgba(0, 242, 255, 0.2);
-    width: 180px;
+    width: 185px;
     height: 285px;
     flex-shrink: 0;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: cardEntrance 0.5s ease backwards;
-    /* Se activa al renderizar */
+    animation: cardEntrance 0.4s ease backwards;
 }
 
-/* --- IMAGEN Y TRANSICIÓN DE FADE --- */
 .card-img-top {
     height: 140px;
     display: flex;
@@ -158,66 +159,43 @@ header {
     align-items: flex-end;
     position: relative;
     background: radial-gradient(circle at bottom, #151a30 0%, transparent 70%);
-}
-
-/* --- IMAGEN Y TRANSICIÓN (EFECTO DE INMERSIÓN) --- */
-.card-img-top {
-    height: 140px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    position: relative;
-    background: radial-gradient(circle at bottom, #151a30 0%, transparent 70%);
-
-    /* CLAVE: Corta la imagen cuando baja más allá del borde */
     overflow: hidden;
 }
 
-/* PEDESTAL (Ahora con z-index superior) */
+/* Pedestal - Z-Index 5 para tapar pies */
 .card-img-top::after {
     content: "";
     position: absolute;
     bottom: 0;
     width: 80%;
-    height: 4px;
-    /* Un poco más grueso para que tape mejor los pies */
+    height: 3px;
     background: var(--v-cyan);
-    border-radius: 50%;
-    filter: blur(3px);
+    filter: blur(4px);
     opacity: 0.8;
-    /* Más opaco para ocultar la imagen detrás */
     box-shadow: 0 0 10px var(--v-cyan);
-
-    /* CLAVE: El pedestal se coloca por encima del personaje */
     z-index: 5;
 }
 
 .card-img-top img {
     max-height: 130px;
     width: auto;
-
-    /* CLAVE: El personaje está en una capa inferior al pedestal */
     z-index: 2;
-
-    transition: opacity 0.20s ease-in, transform 0.20s ease-in;
+    transition: opacity 0.3s ease, transform 0.3s ease;
     opacity: 0;
     transform: translateY(20px);
-    /* Empieza más abajo para que "emerja" */
 }
 
-/* ESTADO VISIBLE: Sube a su posición original */
 .img-visible {
     opacity: 1 !important;
     transform: translateY(0) !important;
 }
 
-/* ESTADO OCULTO: Se hunde bajo el pedestal y desaparece */
 .img-hidden {
     opacity: 0 !important;
     transform: translateY(20px) !important;
 }
 
-/* --- CONTROLES --- */
+/* Información */
 .card-info {
     padding: 10px;
     background: rgba(0, 0, 0, 0.4);
@@ -247,7 +225,6 @@ header {
 .options-row {
     display: flex;
     justify-content: space-around;
-    align-items: flex-start;
     gap: 10px;
 }
 
@@ -267,7 +244,7 @@ header {
     text-align: center;
 }
 
-/* Switch UI - Sin Ticks Nativos */
+/* Switch UI */
 .switch {
     position: relative;
     width: 34px;
@@ -310,7 +287,7 @@ input:checked+.slider:before {
     box-shadow: 0 0 8px var(--v-cyan);
 }
 
-/* --- EQUIPOS DISPONIBLES CENTRADO --- */
+/* --- EQUIPOS --- */
 .section-label {
     font-family: var(--font-tech);
     font-size: 1.2rem;
@@ -354,15 +331,15 @@ input:checked+.slider:before {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 15px;
     transition: 0.3s;
 }
 
 .team-box img {
-    width: 85%;
-    height: 85%;
+    width: 90%;
+    height: 90%;
     object-fit: contain;
     filter: grayscale(0.5);
-    transition: 0.3s;
 }
 
 .team-box.selected {
@@ -375,7 +352,6 @@ input:checked+.slider:before {
     filter: grayscale(0) drop-shadow(0 0 10px var(--v-cyan));
 }
 
-/* Flechas */
 .img-nav {
     position: absolute;
     top: 40%;
@@ -394,12 +370,8 @@ input:checked+.slider:before {
     border: 1px solid var(--v-cyan);
     color: white;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     cursor: pointer;
     font-size: 10px;
-}
-
-.hidden {
-    display: none !important;
 }

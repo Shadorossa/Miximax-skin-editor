@@ -2,11 +2,18 @@ const FILE_NAME = "chara_model_1.03.49.00.cfg";
 const currentViewIndex = {};
 let selectedTeam = null;
 
+// FUNCIÓN PARA LIMPIAR CACHÉ
+function forceCacheReload() {
+    // Añadimos un timestamp para forzar al navegador a descargar archivos nuevos
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.location.href = cleanUrl + '?update=' + new Date().getTime();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     renderTeamSelection();
 });
 
-// --- LÓGICA DE SELECCIÓN DE EQUIPO ---
+// --- LÓGICA DE EQUIPOS ---
 function renderTeamSelection() {
     const grid = document.getElementById('team-grid');
     let teams = [...new Set(playersData.filter(p => !p.isSubOption).map(p => p.team))];
@@ -30,14 +37,13 @@ function selectTeam(teamName) {
     renderPlayerRow(teamName);
 }
 
-// --- RENDERIZADO DE JUGADORES ---
+// --- RENDERIZADO JUGADORES ---
 function renderPlayerRow(teamName) {
     const row = document.getElementById('player-row');
     const filteredPlayers = playersData.filter(p => p.team === teamName && !p.isSubOption);
 
     row.innerHTML = filteredPlayers.map((player, index) => {
         const isChecked = localStorage.getItem(player.id) === 'true';
-        // Resetear índice al renderizar el equipo para evitar bugs de desbordamiento
         currentViewIndex[player.id] = 0;
 
         return `
@@ -75,22 +81,14 @@ function renderPlayerRow(teamName) {
     filteredPlayers.forEach(p => updateVisuals(p.id, false, true));
 }
 
-// --- GESTIÓN DE IMÁGENES (Sincronizada) ---
-
-// Función auxiliar para obtener qué imágenes deben mostrarse según los switches
 function getActiveImages(player) {
     let images = [];
     const checkMiximax = document.getElementById(player.id)?.checked;
-
     if (player.id === "flora_base") {
         const checkArmor = document.getElementById("flora_armadura")?.checked;
         if (checkMiximax) images.push(player.imgMiximax);
         if (checkArmor) images.push(player.imgArmadura);
-    } else {
-        if (checkMiximax) images.push(player.imgMiximax);
-    }
-
-    // Si no hay nada seleccionado, devolvemos solo la base
+    } else { if (checkMiximax) images.push(player.imgMiximax); }
     return images.length > 0 ? images : [player.imgBase];
 }
 
@@ -100,21 +98,13 @@ function updateVisuals(mainId, save, isInitial = false) {
     const nav = document.getElementById(`nav-${mainId}`);
 
     if (save) {
-        const checkMiximax = document.getElementById(mainId).checked;
-        localStorage.setItem(mainId, checkMiximax);
-        if (mainId === "flora_base") {
-            localStorage.setItem("flora_armadura", document.getElementById("flora_armadura").checked);
-        }
+        localStorage.setItem(mainId, document.getElementById(mainId).checked);
+        if (mainId === "flora_base") localStorage.setItem("flora_armadura", document.getElementById("flora_armadura").checked);
+        currentViewIndex[mainId] = 0;
     }
 
     const activeImages = getActiveImages(player);
-
-    // Si cambiamos los switches, reseteamos al primer estado disponible para evitar bugs
-    if (!isInitial && !save) currentViewIndex[mainId] = 0;
-    if (save) currentViewIndex[mainId] = 0;
-
     if (nav) nav.style.display = activeImages.length > 1 ? "flex" : "none";
-
     const targetSrc = activeImages[currentViewIndex[mainId] || 0];
 
     if (isInitial) {
@@ -135,12 +125,9 @@ function changeView(id, dir) {
     const player = playersData.find(p => p.id === id);
     const activeImages = getActiveImages(player);
     const imgElement = document.getElementById(`img-display-${id}`);
-
     imgElement.classList.remove('img-visible');
     imgElement.classList.add('img-hidden');
-
     setTimeout(() => {
-        // Cálculo circular del índice
         currentViewIndex[id] = (currentViewIndex[id] + dir + activeImages.length) % activeImages.length;
         imgElement.src = activeImages[currentViewIndex[id]];
         imgElement.classList.remove('img-hidden');
@@ -148,18 +135,15 @@ function changeView(id, dir) {
     }, 250);
 }
 
-function handleToggle(id) {
-    updateVisuals(id, true, false);
-}
+function handleToggle(id) { updateVisuals(id, true, false); }
 
-// --- MOTOR DE PROCESAMIENTO BINARIO ---
+// --- MOTOR HEX (Sincronizado) ---
 async function processAndDownload() {
     try {
         const res = await fetch(FILE_NAME);
-        if (!res.ok) throw new Error(`No se pudo encontrar el archivo ${FILE_NAME} en la raíz.`);
+        if (!res.ok) throw new Error(`Archivo ${FILE_NAME} no encontrado.`);
         const buffer = await res.arrayBuffer();
         let data = new Uint8Array(buffer);
-
         playersData.forEach(p => {
             const el = document.getElementById(p.id) || { checked: localStorage.getItem(p.id) === 'true' };
             const active = el.checked;
@@ -167,11 +151,9 @@ async function processAndDownload() {
             const rH = active ? p.hexModified : p.hexOriginal;
             if (sH && rH && !sH.includes("HEX_")) data = replaceByteSequence(data, sH, rH);
         });
-
         const blob = new Blob([data], { type: "application/octet-stream" });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = FILE_NAME; a.click();
+        const a = document.createElement('a'); a.href = url; a.download = FILE_NAME; a.click();
     } catch (e) { alert(e.message); }
 }
 
@@ -206,7 +188,7 @@ function loadConfig(event) {
         const config = JSON.parse(e.target.result);
         for (const id in config) { localStorage.setItem(id, config[id]); }
         if (selectedTeam) renderPlayerRow(selectedTeam);
-        alert("Configuración cargada correctamente.");
+        alert("Configuración cargada.");
     };
     reader.readAsText(event.target.files[0]);
 }

@@ -3,23 +3,37 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Inazuma Miximax Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miximax Editor @Shadorossa</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
     <header>
-        <h1>Inazuma Eleven Miximax Editor</h1>
-        <div class="controls">
-            <input type="file" id="fileInput" accept=".bin">
-            <button onclick="applyChanges()">Aplicar y Descargar</button>
-            <button onclick="saveConfig()">Guardar Configuración (.txt)</button>
-            <input type="file" id="importConfig" style="display:none" onchange="loadConfig(event)">
-            <button onclick="document.getElementById('importConfig').click()">Importar Configuración</button>
+        <div class="logo">
+            Miximax<span>Editor</span>
+            <a href="https://x.com/Naczet_" target="_blank" class="author-link">@Shadorossa</a>
+        </div>
+        <div class="header-actions">
+            <button onclick="processAndDownload()" class="btn-action main">⚡ GENERAR .BIN</button>
+            <div class="sep"></div>
+            <button onclick="saveConfig()" class="btn-action sub">Guardar</button>
+            <button onclick="document.getElementById('importFile').click()" class="btn-action sub">Cargar</button>
+            <input type="file" id="importFile" style="display:none" onchange="loadConfig(event)">
         </div>
     </header>
 
-    <main id="playerGrid">
+    <main id="editor-layout">
+        <section id="player-row-container">
+            <div id="active-team-title">SELECCIONA UN EQUIPO</div>
+            <div id="player-row" class="player-carousel"></div>
+        </section>
+
+        <section id="team-selection-container">
+            <div class="section-label">Equipos Disponibles</div>
+            <div id="team-grid" class="team-selection-grid"></div>
+        </section>
     </main>
 
     <script src="data.js"></script>

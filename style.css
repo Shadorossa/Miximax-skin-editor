@@ -1,53 +1,381 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;700&display=swap');
+
+:root {
+    --bg-deep: #05070f;
+    --bg-surface: #0d1124;
+    --v-cyan: #00f2ff;
+    --v-blue: #0066ff;
+    --v-glass: rgba(0, 242, 255, 0.05);
+    --text: #e6f5ff;
+    --text-muted: #8a9aa8;
+    --font-tech: 'Rajdhani', sans-serif;
+}
+
 body {
-    background: #1a1a2e;
-    color: white;
-    font-family: sans-serif;
+    background-color: var(--bg-deep);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
     margin: 0;
-    padding: 20px;
+    overflow-x: hidden;
+    background-image: radial-gradient(rgba(0, 242, 255, 0.08) 1px, transparent 1px);
+    background-size: 25px 25px;
+    background-attachment: fixed;
 }
 
+/* --- HEADER --- */
 header {
-    text-align: center;
-    background: #16213e;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
+    background: white;
+    padding: 10px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--v-blue);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
 }
 
-.player-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+.logo {
+    font-family: var(--font-tech);
+    font-size: 1.3rem;
+    color: #002d55;
+    font-weight: 700;
+}
+
+.logo span {
+    color: var(--v-blue);
+}
+
+.author-link {
+    font-size: 0.75rem;
+    color: var(--v-blue);
+    text-decoration: none;
+    margin-left: 10px;
+    transition: 0.3s;
+}
+
+.author-link:hover {
+    color: var(--v-cyan);
+    text-shadow: 0 0 8px var(--v-cyan);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-action {
+    font-family: var(--font-tech);
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: 0.2s;
+    font-size: 0.85rem;
+}
+
+.btn-action.main {
+    background: linear-gradient(135deg, var(--v-blue), #003a99);
+    color: white;
+    padding: 10px 25px;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+}
+
+.btn-action.sub {
+    background: #eef4f8;
+    color: #002d55;
+    padding: 8px 15px;
+    border-radius: 2px;
+    border: 1px solid #d0deea;
+    margin-left: 5px;
+}
+
+/* --- CONTENEDOR DE JUGADORES --- */
+#player-row-container {
+    background: var(--bg-surface);
+    border: 1px solid rgba(0, 242, 255, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 1160px;
+    height: 350px;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+#active-team-title {
+    font-family: var(--font-tech);
+    font-size: 1.3rem;
+    color: var(--v-cyan);
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.player-carousel {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 10px 5px;
+    flex-grow: 1;
+}
+
+/* --- ANIMACIÓN DE APARICIÓN DE TARJETAS --- */
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .player-card {
-    background: #0f3460;
-    padding: 15px;
-    border-radius: 10px;
+    background: #0a0e1a;
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    width: 180px;
+    height: 285px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: cardEntrance 0.5s ease backwards;
+    /* Se activa al renderizar */
+}
+
+/* --- IMAGEN Y TRANSICIÓN DE FADE --- */
+.card-img-top {
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: relative;
+    background: radial-gradient(circle at bottom, #151a30 0%, transparent 70%);
+}
+
+/* Pedestal anclado (No flotan) */
+.card-img-top::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 80%;
+    height: 3px;
+    background: var(--v-cyan);
+    filter: blur(4px);
+    opacity: 0.6;
+    box-shadow: 0 0 10px var(--v-cyan);
+}
+
+.card-img-top img {
+    max-height: 130px;
+    width: auto;
+    z-index: 2;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    /* FADE SMOOTH */
+    opacity: 0;
+    /* Por defecto para el efecto inicial */
+}
+
+.img-visible {
+    opacity: 1 !important;
+    transform: scale(1);
+}
+
+.img-hidden {
+    opacity: 0 !important;
+    transform: scale(0.9);
+}
+
+/* --- CONTROLES --- */
+.card-info {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    height: 145px;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-name-container {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.card-name {
+    font-family: var(--font-tech);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
     text-align: center;
-    transition: transform 0.2s;
+    margin: 0;
 }
 
-.player-card:hover {
-    transform: scale(1.05);
+.options-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 10px;
 }
 
-.player-card img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
+.control-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
 }
 
-button {
-    background: #e94560;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+.control-label {
+    font-family: var(--font-tech);
+    font-size: 0.58rem;
+    color: var(--v-cyan);
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Switch UI - Sin Ticks Nativos */
+.switch {
+    position: relative;
+    width: 34px;
+    height: 16px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
     cursor: pointer;
-    margin: 5px;
+    inset: 0;
+    background-color: #080a12;
+    border: 1px solid rgba(0, 242, 255, 0.3);
+    transition: .3s;
+    border-radius: 2px;
 }
 
-button:hover {
-    background: #ff2e63;
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 10px;
+    width: 4px;
+    left: 4px;
+    bottom: 2px;
+    background: #3a4558;
+    transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input:checked+.slider {
+    border-color: var(--v-cyan);
+    background: rgba(0, 242, 255, 0.1);
+}
+
+input:checked+.slider:before {
+    transform: translateX(18px);
+    background-color: var(--v-cyan);
+    box-shadow: 0 0 8px var(--v-cyan);
+}
+
+/* --- EQUIPOS DISPONIBLES CENTRADO --- */
+.section-label {
+    font-family: var(--font-tech);
+    font-size: 1.2rem;
+    color: #fff;
+    margin: 30px 0 20px 0;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.section-label::before,
+.section-label::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--v-cyan));
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.4);
+}
+
+.section-label::after {
+    background: linear-gradient(90deg, var(--v-cyan), transparent);
+}
+
+.team-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 20px;
+    max-width: 1160px;
+    margin: 0 auto 50px;
+}
+
+.team-box {
+    aspect-ratio: 1/1;
+    background: rgba(15, 20, 35, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.team-box img {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
+    filter: grayscale(0.5);
+    transition: 0.3s;
+}
+
+.team-box.selected {
+    border-color: var(--v-cyan);
+    background: rgba(0, 242, 255, 0.05);
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+}
+
+.team-box.selected img {
+    filter: grayscale(0) drop-shadow(0 0 10px var(--v-cyan));
+}
+
+/* Flechas */
+.img-nav {
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5px;
+    box-sizing: border-box;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.img-nav button {
+    pointer-events: auto;
+    background: rgba(0, 242, 255, 0.2);
+    border: 1px solid var(--v-cyan);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+.hidden {
+    display: none !important;
 }

@@ -28,7 +28,7 @@ const playersData = [
         imgBase: "img/player/2432_ArionSherwind.png",
         imgMiximax: "img/player/3900_ArionSherwind.png",
         hexOriginal: "FF 33 7C 83 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 74 B3 CB D5 33 C3 D5 D8 00 00 00 00 00 00 00 00 08 00 00 00 F2 59 01",
-        hexModified: "FF 33 7C 83 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 CA 0F 02"
+        hexModified: "FF 33 7C 83 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 74 B3 CB D5 33 C3 D5 D8 00 00 00 00 00 00 00 00 08 00 00 00 CA 0F 02"
     },
     {
         id: "drakul",
@@ -55,7 +55,7 @@ const playersData = [
         imgBase: "img/player/3583_ArEcks.png",
         imgMiximax: "img/player/3923_ArEcks.png",
         hexOriginal: "B7 6C 7F F0 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 F7 50 38 CF B0 20 26 C2 00 00 00 00 00 00 00 00 00 00 00 00 A4 E9 01",
-        hexModified: "B7 6C 7F F0 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 34 13 02"
+        hexModified: "B7 6C 7F F0 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 F7 50 38 CF B0 20 26 C2 00 00 00 00 00 00 00 00 00 00 00 00 34 13 02"
     },
     {
         id: "mercury",
@@ -72,8 +72,8 @@ const playersData = [
         team: "ProtocoloOmega3",
         imgBase: "img/player/3514_Romeo.png",
         imgMiximax: "img/player/3904_Romeo.png",
-        hexOriginal: "E7 C6 46 8B 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 9A 3C 81 D1 AD C3 7F 14 3F E2 3A 3A 00 00 00 00 00 00 00 00 F6 E2 01",
-        hexModified: "E7 C6 46 8B 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 62 10 02"
+        hexOriginal: "E7 C6 46 8B 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 9A 3C 81 D1 AD C3 7F 14 3F E2 3A 3A 00 00 00 00 00 00 00 00 F6 E2 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF 6C 8D BA",
+        hexModified: "E7 C6 46 8B 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 9A 3C 81 D1 AD C3 7F 14 3F E2 3A 3A 00 00 00 00 00 00 00 00 62 10 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF 54 73 C7"
     },
     {
         id: "gamma",
@@ -81,17 +81,8 @@ const playersData = [
         team: "ProtocoloOmega3",
         imgBase: "img/player/3518_Gamma.png",
         imgMiximax: "img/player/3913_Gamma.png",
-        hexOriginal: "9B B0 01 99 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 EA B3 61 19 AD C3 7F 14 00 00 00 00 00 00 00 00 00 00 00 00 8E E3 01",
-        hexModified: "9B B0 01 99 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 B8 11 02"
-    },
-    {
-        id: "simeon",
-        name: "Simeon",
-        team: "Ragnah",
-        imgBase: "img/player/3645_SimeonAyp.png",
-        imgMiximax: "img/player/3931_SimeonAyp.png",
-        hexOriginal: "94 F0 E1 87 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 24 7B CE FF 63 0B D0 F2 00 00 00 00 38 D7 C0 29 00 00 00 00 B2 F2 01",
-        hexModified: "94 F0 E1 87 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 C8 53 02"
+        hexOriginal: "9B B0 01 99 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 EA B3 61 19 AD C3 7F 14 00 00 00 00 00 00 00 00 00 00 00 00 8E E3 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF CC E6 F7",
+        hexModified: "9B B0 01 99 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 EA B3 61 19 AD C3 7F 14 00 00 00 00 00 00 00 00 00 00 00 00 B8 11 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF 54 74 C7"
     },
     {
         id: "victor",
@@ -100,8 +91,8 @@ const playersData = [
         imgBase: "img/player/2433_VictorBlade.png",
         imgMiximax: "img/player/3898_VictorBlade.png",
         // Miximax base de Victor
-        hexOriginal: ["C0 D3 67 4A 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 74 B3 CB D5 33 C3 D5 D8 00 00 00 00 00 00 00 00 0A 00 00 00 3E 5A 01"],
-        hexModified: ["C0 D3 67 4A 00 00 00 00 00 00 00 00 00 00 00 00 DB 6E AC D6 74 B3 CB D5 33 C3 D5 D8 00 00 00 00 00 00 00 00 00 00 00 00 EC 4F 02"],
+        hexOriginal: ["C0 D3 67 4A 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 74 B3 CB D5 33 C3 D5 D8 00 00 00 00 00 00 00 00 0A 00 00 00 3E 5A 01 00 00 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 FF BD D5 F1"],
+        hexModified: ["C0 D3 67 4A 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 74 B3 CB D5 33 C3 D5 D8 00 00 00 00 00 00 00 00 0A 00 00 00 7E 0F 02 00 00 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 FF 6B 96 C9"],
         subOptions: [
             {
                 id: "victor_idolos",
@@ -110,13 +101,22 @@ const playersData = [
                 // Aquí van los dos bloques de los ídolos
                 hexOriginal: [
                     "DD C0 9A FC 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 68 64 65 39 00 00 00 00 00 00 00 00 00 00 00 00 0A 00 00 00 3E 5A 01",
-                    "EA AA 58 FD 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 E8 1F 54 28 00 00 00 00 00 00 00 00 00 00 00 00 0A 00 00 00 3E 5A 01"
+                    "EA AA 58 FD 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 7E 0F 02"
                 ],
                 hexModified: [
                     "DD C0 9A FC 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 68 64 65 39 00 00 00 00 00 00 00 00 00 00 00 00 0A 00 00 00 EC 4F 02",
-                    "EA AA 58 FD 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 E8 1F 54 28 00 00 00 00 00 00 00 00 00 00 00 00 0A 00 00 00 EC 4F 02"
+                    "EA AA 58 FD 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 7E 0F 02"
                 ]
             }
         ]
     },
+    {
+        id: "zanark",
+        name: "Zanark",
+        team: "Zanark Domain",
+        imgBase: "img/player/3568_ZanarkAvalonic.png",
+        imgMiximax: "img/player/3902_ZanarkAvalonic.png",
+        hexOriginal: "AD 44 65 29 00 00 00 00 00 00 00 00 00 00 00 00 7A FC C4 54 52 83 64 04 15 F3 7A 09 00 00 00 00 00 00 00 00 00 00 00 00 6A E7 01",
+        hexModified: "AD 44 65 29 00 00 00 00 00 00 00 00 00 00 00 00 7A FC C4 54 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 16 10 02"
+    }
 ];

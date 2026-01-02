@@ -1,64 +1,76 @@
-// --- CONFIGURACIÓN DINÁMICA ---
-const GITHUB_USER = "tu_usuario"; // <--- REVISA QUE ESTÉ TU USUARIO
-const GITHUB_REPO = "tu_repo";    // <--- REVISA QUE ESTÉ TU REPO
+/**
+ * CONFIGURACIÓN DE REPOSITORIO
+ * Asegúrate de que estos nombres coincidan con tu cuenta de GitHub
+ */
+const GITHUB_USER = "tu_usuario";
+const GITHUB_REPO = "tu_repo";
 let detectedFileName = "chara_model_1.03.49.00.cfg.bin";
 
 const currentViewIndex = {};
 let selectedTeam = null;
 
-// ACTUALIZACIÓN FORZADA DE CACHÉ
+// --- 1. RECARGA DE EMERGENCIA ---
 function forceCacheReload() {
-    // 1. Limpiamos localStorage por si hay datos corruptos de versiones viejas
-    // Si quieres mantener las selecciones, comenta la siguiente línea:
-    // localStorage.clear(); 
-
-    // 2. Redirección con timestamp único para saltar el caché del CDN de GitHub
     const cleanUrl = window.location.origin + window.location.pathname;
     window.location.replace(cleanUrl + '?reload=' + new Date().getTime());
 }
 
-// AUTO-DETECCIÓN DE ARCHIVO .BIN EN REPOSITORIO
+// --- 2. DETECCIÓN AUTOMÁTICA DEL ARCHIVO .BIN ---
 async function autoDetectFile() {
     try {
         const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`;
         const res = await fetch(apiUrl);
         if (!res.ok) return;
-
         const files = await res.json();
-        const targetFile = files.find(f =>
+        const target = files.find(f =>
             f.name.toLowerCase().startsWith("chara_model") &&
             f.name.toLowerCase().endsWith(".bin")
         );
-
-        if (targetFile) {
-            detectedFileName = targetFile.name;
-            console.log("Archivo binario detectado:", detectedFileName);
+        if (target) {
+            detectedFileName = target.name;
+            console.log("Archivo detectado:", detectedFileName);
         }
     } catch (e) {
-        console.warn("Error en auto-detección, usando fallback.");
+        console.warn("API de GitHub no disponible, usando nombre base.");
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    autoDetectFile();
-    // El renderizado de equipos ahora se dispara desde data.js una vez cargado
-    if (typeof playersData !== 'undefined') renderTeamSelection();
-});
+// --- 3. INICIALIZADOR PRINCIPAL ---
+async function startEditor() {
+    console.log("Iniciando Editor...");
 
-// --- LÓGICA DE EQUIPOS ---
+    // Esperamos a que el .bin sea detectado
+    await autoDetectFile();
+
+    // Verificamos si los datos existen
+    if (typeof playersData === 'undefined') {
+        console.error("CRÍTICO: No se ha encontrado 'playersData'. Revisa que data.js no tenga errores de sintaxis.");
+        alert("Error: No se pudieron cargar los datos de los jugadores.");
+        return;
+    }
+
+    renderTeamSelection();
+}
+
+// --- 4. RENDERIZADO DE EQUIPOS ---
 function renderTeamSelection() {
     const grid = document.getElementById('team-grid');
     if (!grid) return;
 
+    // Obtenemos equipos únicos y ordenamos alfabéticamente
     let teams = [...new Set(playersData.filter(p => !p.isSubOption).map(p => p.team))];
     teams.sort((a, b) => a.localeCompare(b));
 
     grid.innerHTML = teams.map(teamName => {
         const teamId = teamName.replace(/\s/g, '');
-        return `<div class="team-box" id="box-${teamId}" onclick="selectTeam('${teamName}')" title="${teamName}">
-                    <img src="img/team/${teamId}.png" onerror="this.src='img/team/default.png'">
-                </div>`;
+        return `
+            <div class="team-box" id="box-${teamId}" onclick="selectTeam('${teamName}')" title="${teamName}">
+                <img src="img/team/${teamId}.png" onerror="this.src='img/team/default.png'">
+            </div>
+        `;
     }).join('');
+
+    console.log("Equipos renderizados:", teams.length);
 }
 
 function selectTeam(teamName) {
@@ -72,7 +84,7 @@ function selectTeam(teamName) {
     renderPlayerRow(teamName);
 }
 
-// --- LÓGICA JUGADORES (ORDEN NUMÉRICO + INDICADOR "2") ---
+// --- 5. RENDERIZADO JUGADORES (ORDEN NUMÉRICO + INDICADOR 2) ---
 function getPlayerNumber(path) {
     const filename = path.split('/').pop();
     const match = filename.match(/^\d+/);
@@ -81,21 +93,22 @@ function getPlayerNumber(path) {
 
 function renderPlayerRow(teamName) {
     const row = document.getElementById('player-row');
-    let filteredPlayers = playersData.filter(p => p.team === teamName && !p.isSubOption);
+    let filtered = playersData.filter(p => p.team === teamName && !p.isSubOption);
 
-    filteredPlayers.sort((a, b) => getPlayerNumber(a.imgBase) - getPlayerNumber(b.imgBase));
+    // Ordenamos por el número de la imagen
+    filtered.sort((a, b) => getPlayerNumber(a.imgBase) - getPlayerNumber(b.imgBase));
 
-    row.innerHTML = filteredPlayers.map((player, index) => {
+    row.innerHTML = filtered.map((player, index) => {
         const isChecked = localStorage.getItem(player.id) === 'true';
         currentViewIndex[player.id] = 0;
 
-        const hasIdenticalImages = (player.imgBase === player.imgMiximax) && player.imgMiximax;
-        const indicatorHTML = hasIdenticalImages ? `<span class="indicator-modified" id="ind-${player.id}">2</span>` : '';
+        const hasSameImg = (player.imgBase === player.imgMiximax) && player.imgMiximax;
+        const indicator = hasSameImg ? `<span class="indicator-modified" id="ind-${player.id}">2</span>` : '';
 
         return `
         <div class="player-card" id="card-${player.id}" style="animation-delay: ${index * 0.05}s">
-            <div class="card-img-top" id="container-${player.id}">
-                ${indicatorHTML}
+            <div class="card-img-top">
+                ${indicator}
                 <div class="img-nav" id="nav-${player.id}" style="display:none">
                     <button onclick="changeView('${player.id}', -1)">❮</button>
                     <button onclick="changeView('${player.id}', 1)">❯</button>
@@ -125,124 +138,112 @@ function renderPlayerRow(teamName) {
         </div>`;
     }).join('');
 
-    filteredPlayers.forEach(p => updateVisuals(p.id, false, true));
+    filtered.forEach(p => updateVisuals(p.id, false, true));
 }
 
+// --- 6. GESTIÓN DE IMÁGENES ---
 function getActiveImages(player) {
     let images = [];
-    const checkMiximax = document.getElementById(player.id)?.checked;
+    const mix = document.getElementById(player.id)?.checked;
     if (player.id === "flora_base") {
-        const checkArmor = document.getElementById("flora_armadura")?.checked;
-        if (checkMiximax) images.push(player.imgMiximax);
-        if (checkArmor) images.push(player.imgArmadura);
-    } else { if (checkMiximax) images.push(player.imgMiximax); }
+        const arm = document.getElementById("flora_armadura")?.checked;
+        if (mix) images.push(player.imgMiximax);
+        if (arm) images.push(player.imgArmadura);
+    } else { if (mix) images.push(player.imgMiximax); }
     return images.length > 0 ? images : [player.imgBase];
 }
 
-function updateVisuals(mainId, save, isInitial = false) {
-    const player = playersData.find(p => p.id === mainId);
-    const imgElement = document.getElementById(`img-display-${mainId}`);
-    const nav = document.getElementById(`nav-${mainId}`);
-    const mainSwitch = document.getElementById(mainId);
-    if (!imgElement) return;
+function updateVisuals(id, save, initial = false) {
+    const p = playersData.find(x => x.id === id);
+    const img = document.getElementById(`img-display-${id}`);
+    const nav = document.getElementById(`nav-${id}`);
+    const sw = document.getElementById(id);
+    if (!img) return;
 
     if (save) {
-        localStorage.setItem(mainId, mainSwitch.checked);
-        if (mainId === "flora_base") localStorage.setItem("flora_armadura", document.getElementById("flora_armadura").checked);
-        currentViewIndex[mainId] = 0;
+        localStorage.setItem(id, sw.checked);
+        if (id === "flora_base") localStorage.setItem("flora_armadura", document.getElementById("flora_armadura").checked);
+        currentViewIndex[id] = 0;
     }
 
-    const indicator = document.getElementById(`ind-${mainId}`);
-    if (indicator) mainSwitch.checked ? indicator.classList.add('visible') : indicator.classList.remove('visible');
+    const ind = document.getElementById(`ind-${id}`);
+    if (ind) sw.checked ? ind.classList.add('visible') : ind.classList.remove('visible');
 
-    const activeImages = getActiveImages(player);
-    if (nav) nav.style.display = activeImages.length > 1 ? "flex" : "none";
-    const targetSrc = activeImages[currentViewIndex[mainId] || 0];
+    const active = getActiveImages(p);
+    if (nav) nav.style.display = active.length > 1 ? "flex" : "none";
+    const src = active[currentViewIndex[id] || 0];
 
-    if (isInitial) {
-        imgElement.src = targetSrc;
-        setTimeout(() => imgElement.classList.add('img-visible'), 100);
+    if (initial) {
+        img.src = src;
+        setTimeout(() => img.classList.add('img-visible'), 100);
     } else {
-        imgElement.classList.remove('img-visible');
-        imgElement.classList.add('img-hidden');
-
-        const animationPromise = new Promise(resolve => setTimeout(resolve, 250));
-        const imageLoadPromise = new Promise(resolve => {
-            const temp = new Image();
-            temp.onload = () => resolve();
-            temp.onerror = () => resolve();
-            temp.src = targetSrc;
-        });
-
-        Promise.all([animationPromise, imageLoadPromise]).then(() => {
-            imgElement.src = targetSrc;
-            imgElement.classList.remove('img-hidden');
-            imgElement.classList.add('img-visible');
+        img.classList.remove('img-visible');
+        img.classList.add('img-hidden');
+        const p1 = new Promise(r => setTimeout(r, 250));
+        const p2 = new Promise(r => { const t = new Image(); t.onload = r; t.src = src; });
+        Promise.all([p1, p2]).then(() => {
+            img.src = src;
+            img.classList.remove('img-hidden');
+            img.classList.add('img-visible');
         });
     }
 }
 
 function changeView(id, dir) {
-    const player = playersData.find(p => p.id === id);
-    const activeImages = getActiveImages(player);
-    const imgElement = document.getElementById(`img-display-${id}`);
-    const newIndex = (currentViewIndex[id] + dir + activeImages.length) % activeImages.length;
-    const targetSrc = activeImages[newIndex];
+    const p = playersData.find(x => x.id === id);
+    const active = getActiveImages(p);
+    const img = document.getElementById(`img-display-${id}`);
+    const next = (currentViewIndex[id] + dir + active.length) % active.length;
 
-    imgElement.classList.remove('img-visible');
-    imgElement.classList.add('img-hidden');
+    img.classList.remove('img-visible');
+    img.classList.add('img-hidden');
+    const p1 = new Promise(r => setTimeout(r, 250));
+    const p2 = new Promise(r => { const t = new Image(); t.onload = r; t.src = active[next]; });
 
-    const animationPromise = new Promise(resolve => setTimeout(resolve, 250));
-    const imageLoadPromise = new Promise(resolve => {
-        const temp = new Image();
-        temp.onload = () => resolve();
-        temp.src = targetSrc;
-    });
-
-    Promise.all([animationPromise, imageLoadPromise]).then(() => {
-        currentViewIndex[id] = newIndex;
-        imgElement.src = targetSrc;
-        imgElement.classList.remove('img-hidden');
-        imgElement.classList.add('img-visible');
+    Promise.all([p1, p2]).then(() => {
+        currentViewIndex[id] = next;
+        img.src = active[next];
+        img.classList.remove('img-hidden');
+        img.classList.add('img-visible');
     });
 }
 
 function handleToggle(id) { updateVisuals(id, true, false); }
 
+// --- 7. PROCESAMIENTO BINARIO ---
 async function processAndDownload() {
     try {
         const res = await fetch(detectedFileName + '?v=' + new Date().getTime());
-        if (!res.ok) throw new Error("No se pudo cargar el archivo .bin de base.");
-        const buffer = await res.arrayBuffer();
-        let data = new Uint8Array(buffer);
+        if (!res.ok) throw new Error("No se pudo cargar el archivo base .bin");
+        const buf = await res.arrayBuffer();
+        let data = new Uint8Array(buf);
         playersData.forEach(p => {
             const el = document.getElementById(p.id) || { checked: localStorage.getItem(p.id) === 'true' };
-            const active = el.checked;
-            const sH = active ? p.hexOriginal : p.hexModified;
-            const rH = active ? p.hexModified : p.hexOriginal;
-            if (sH && rH && !sH.includes("HEX_")) data = replaceByteSequence(data, sH, rH);
+            const act = el.checked;
+            const sH = act ? p.hexOriginal : p.hexModified;
+            const rH = act ? p.hexModified : p.hexOriginal;
+            if (sH && rH && !sH.includes("HEX_")) data = replace(data, sH, rH);
         });
-        const blob = new Blob([data], { type: "application/octet-stream" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = detectedFileName; a.click();
+        const b = new Blob([data], { type: "application/octet-stream" });
+        const u = URL.createObjectURL(b);
+        const a = document.createElement('a'); a.href = u; a.download = detectedFileName; a.click();
     } catch (e) { alert(e.message); }
 }
 
-function replaceByteSequence(data, sH, rH) {
-    const sB = hexToBytes(sH), rB = hexToBytes(rH);
-    if (sB.length !== rB.length) return data;
+function replace(data, sH, rH) {
+    const sB = hexToB(sH), rB = hexToB(rH);
     for (let i = 0; i <= data.length - sB.length; i++) {
-        let match = true;
-        for (let j = 0; j < sB.length; j++) if (data[i + j] !== sB[j]) { match = false; break; }
-        if (match) data.set(rB, i);
+        let m = true;
+        for (let j = 0; j < sB.length; j++) if (data[i + j] !== sB[j]) { m = false; break; }
+        if (m) data.set(rB, i);
     }
     return data;
 }
 
-function hexToBytes(hex) {
-    const clean = hex.replace(/\s+/g, '');
+function hexToB(h) {
+    const c = h.replace(/\s+/g, '');
     let b = [];
-    for (let i = 0; i < clean.length; i += 2) b.push(parseInt(clean.substr(i, 2), 16));
+    for (let i = 0; i < c.length; i += 2) b.push(parseInt(c.substr(i, 2), 16));
     return new Uint8Array(b);
 }
 
@@ -250,16 +251,20 @@ function saveConfig() {
     let c = {};
     playersData.forEach(p => { c[p.id] = (localStorage.getItem(p.id) === 'true'); });
     const b = new Blob([JSON.stringify(c, null, 2)], { type: "text/plain" });
-    const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = "config_miximax.txt"; a.click();
+    const u = URL.createObjectURL(b);
+    const a = document.createElement('a'); a.href = u; a.download = "config_miximax.txt"; a.click();
 }
 
-function loadConfig(event) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const config = JSON.parse(e.target.result);
-        for (const id in config) { localStorage.setItem(id, config[id]); }
+function loadConfig(e) {
+    const r = new FileReader();
+    r.onload = (ev) => {
+        const c = JSON.parse(ev.target.result);
+        for (const id in c) { localStorage.setItem(id, c[id]); }
         if (selectedTeam) renderPlayerRow(selectedTeam);
         alert("Configuración cargada.");
     };
-    reader.readAsText(event.target.files[0]);
+    r.readAsText(e.target.files[0]);
 }
+
+// LANZAMIENTO
+startEditor();

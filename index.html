@@ -19,8 +19,7 @@
             <a href="https://x.com/Naczet_" target="_blank" class="author-link">@Shadorossa</a>
         </div>
         <div class="header-actions">
-            <button onclick="forceCacheReload()" class="btn-action sub" title="Forzar recarga completa desde GitHub">🔄
-                ACTUALIZAR</button>
+            <button onclick="forceCacheReload()" class="btn-action sub">🔄 ACTUALIZAR</button>
             <div class="sep"></div>
             <button onclick="processAndDownload()" class="btn-action main">⚡ GENERAR .BIN</button>
             <div class="sep"></div>
@@ -43,14 +42,16 @@
     </main>
 
     <script>
-        const version = new Date().getTime();
-        const scripts = ['data.js', 'main.js'];
-        scripts.forEach(src => {
-            const script = document.createElement('script');
-            script.src = `${src}?v=${version}`;
-            script.async = false;
-            document.body.appendChild(script);
-        });
+        const cacheVersion = new Date().getTime();
+        const scriptData = document.createElement('script');
+        scriptData.src = 'data.js?v=' + cacheVersion;
+        document.body.appendChild(scriptData);
+
+        scriptData.onload = () => {
+            const scriptMain = document.createElement('script');
+            scriptMain.src = 'main.js?v=' + cacheVersion;
+            document.body.appendChild(scriptMain);
+        };
     </script>
 </body>
 

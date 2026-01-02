@@ -19,8 +19,8 @@
             <a href="https://x.com/Naczet_" target="_blank" class="author-link">@Shadorossa</a>
         </div>
         <div class="header-actions">
-            <button onclick="forceCacheReload()" class="btn-action sub" title="Forzar recarga de nuevos personajes">🔄
-                Actualizar</button>
+            <button onclick="forceCacheReload()" class="btn-action sub" title="Forzar recarga completa desde GitHub">🔄
+                ACTUALIZAR</button>
             <div class="sep"></div>
             <button onclick="processAndDownload()" class="btn-action main">⚡ GENERAR .BIN</button>
             <div class="sep"></div>
@@ -42,8 +42,16 @@
         </section>
     </main>
 
-    <script src="data.js"></script>
-    <script src="main.js"></script>
+    <script>
+        const version = new Date().getTime();
+        const scripts = ['data.js', 'main.js'];
+        scripts.forEach(src => {
+            const script = document.createElement('script');
+            script.src = `${src}?v=${version}`;
+            script.async = false;
+            document.body.appendChild(script);
+        });
+    </script>
 </body>
 
 </html>

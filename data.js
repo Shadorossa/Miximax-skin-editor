@@ -44,5 +44,14 @@ const playersData = [
         imgMiximax: "img/player/3932_WolframVulpeen.png",
         hexOriginal: "26 8C 6C 83 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 43 5B 4F 69 04 2B 51 64 00 00 00 00 E5 08 25 89 00 00 00 00 12 F5 01",
         hexModified: "BD E6 06 7D 00 00 00 00 00 00 00 00 00 00 00 00 E9 BA 0D 66 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 B0 14 02"
+    },
+    {
+        id: "arecks",
+        name: "Ar Ecks",
+        team: "Cascada Perfecta",
+        imgBase: "img/player/3583_ArEcks.png",
+        imgMiximax: "img/player/3923_ArEcks.png",
+        hexOriginal: "B7 6C 7F F0 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 F7 50 38 CF B0 20 26 C2 00 00 00 00 00 00 00 00 00 00 00 00 A4 E9 01",
+        hexModified: "59 DA 6D 84 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 34 13 02"
     }
 ];

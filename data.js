@@ -53,5 +53,14 @@ const playersData = [
         imgMiximax: "img/player/3923_ArEcks.png",
         hexOriginal: "B7 6C 7F F0 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 F7 50 38 CF B0 20 26 C2 00 00 00 00 00 00 00 00 00 00 00 00 A4 E9 01",
         hexModified: "59 DA 6D 84 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 34 13 02"
+    },
+    {
+        id: "mercury",
+        name: "Mercury",
+        team: "Epsilon Plus",
+        imgBase: "img/player/1076_Mercury.png",
+        imgMiximax: "img/player/1076_Mercury.png",
+        hexOriginal: "EF D7 4F 38 00 00 00 00 00 00 00 00 00 00 00 00 6A 29 68 DF EE 59 FD C5 A9 29 E3 C8 00 00 00 00 CA 8C 03 A8 00 00 00 00 3E A0 00",
+        hexModified: "AA 60 77 8A 00 00 00 00 00 00 00 00 00 00 00 00 6A 29 68 DF 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 F4 35 03"
     }
 ];

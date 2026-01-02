@@ -388,3 +388,35 @@ input:checked+.slider:before {
     cursor: pointer;
     font-size: 10px;
 }
+
+/* --- INDICADOR DE MODIFICACIÓN OCULTA (El "2" Rojo) --- */
+.indicator-modified {
+    position: absolute;
+    bottom: 15px;
+    /* Ajustado para que no pise el pedestal */
+    right: 15px;
+    font-family: var(--font-tech);
+    font-size: 1.8rem;
+    /* Tamaño grande y visible */
+    font-weight: 700;
+    color: #ff2222;
+    /* Rojo intenso */
+    /* Truco para simular borde blanco alrededor del texto */
+    text-shadow:
+        2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff,
+        1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
+    z-index: 10;
+    /* Por encima de todo, incluido el pedestal */
+    opacity: 0;
+    /* Oculto por defecto */
+    transform: scale(0.8);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    /* Para que no moleste al hacer click */
+}
+
+/* Clase para mostrarlo cuando el switch está activo */
+.indicator-modified.visible {
+    opacity: 1;
+    transform: scale(1);
+}

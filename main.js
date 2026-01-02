@@ -2,7 +2,6 @@ const FILE_NAME = "chara_model_1.03.49.00.cfg";
 const currentViewIndex = {};
 let selectedTeam = null;
 
-// FUNCIÓN PARA LIMPIAR CACHÉ
 function forceCacheReload() {
     const cleanUrl = window.location.origin + window.location.pathname;
     window.location.href = cleanUrl + '?update=' + new Date().getTime();
@@ -14,8 +13,6 @@ document.addEventListener('DOMContentLoaded', () => { renderTeamSelection(); });
 function renderTeamSelection() {
     const grid = document.getElementById('team-grid');
     let teams = [...new Set(playersData.filter(p => !p.isSubOption).map(p => p.team))];
-
-    // Orden alfabético de equipos
     teams.sort((a, b) => a.localeCompare(b));
 
     grid.innerHTML = teams.map(teamName => {
@@ -30,15 +27,13 @@ function selectTeam(teamName) {
     document.querySelectorAll('.team-box').forEach(b => b.classList.remove('selected'));
     const teamId = teamName.replace(/\s/g, '');
     if (document.getElementById(`box-${teamId}`)) document.getElementById(`box-${teamId}`).classList.add('selected');
-
     selectedTeam = teamName;
     document.getElementById('active-team-title').innerHTML = `EQUIPO: <span style="color: #fff">${teamName.toUpperCase()}</span>`;
     renderPlayerRow(teamName);
 }
 
-// --- LÓGICA DE ORDENACIÓN DE JUGADORES ---
+// --- LÓGICA JUGADORES CON INDICADOR ---
 function getPlayerNumber(path) {
-    // Extrae el número del nombre del archivo (ej: "3662" de "img/players/3662_Wolfram.png")
     const filename = path.split('/').pop();
     const match = filename.match(/^\d+/);
     return match ? parseInt(match[0]) : 999999;
@@ -47,18 +42,21 @@ function getPlayerNumber(path) {
 function renderPlayerRow(teamName) {
     const row = document.getElementById('player-row');
     let filteredPlayers = playersData.filter(p => p.team === teamName && !p.isSubOption);
-
-    // ORDENAR SEGÚN NÚMERO DE IMAGEN
     filteredPlayers.sort((a, b) => getPlayerNumber(a.imgBase) - getPlayerNumber(b.imgBase));
 
     row.innerHTML = filteredPlayers.map((player, index) => {
         const isChecked = localStorage.getItem(player.id) === 'true';
         currentViewIndex[player.id] = 0;
 
+        // DETECCIÓN: ¿Tienen la misma imagen base y miximax?
+        // Si es así, preparamos el indicador (oculto por ahora)
+        const hasIdenticalImages = (player.imgBase === player.imgMiximax) && player.imgMiximax;
+        const indicatorHTML = hasIdenticalImages ? `<span class="indicator-modified" id="ind-${player.id}">2</span>` : '';
+
         return `
         <div class="player-card" id="card-${player.id}" style="animation-delay: ${index * 0.05}s">
             <div class="card-img-top" id="container-${player.id}">
-                <div class="img-nav" id="nav-${player.id}" style="display:none">
+                ${indicatorHTML} <div class="img-nav" id="nav-${player.id}" style="display:none">
                     <button onclick="changeView('${player.id}', -1)">❮</button>
                     <button onclick="changeView('${player.id}', 1)">❯</button>
                 </div>
@@ -90,8 +88,6 @@ function renderPlayerRow(teamName) {
     filteredPlayers.forEach(p => updateVisuals(p.id, false, true));
 }
 
-// --- GESTIÓN VISUAL (Pre-carga e Inmersión) ---
-
 function getActiveImages(player) {
     let images = [];
     const checkMiximax = document.getElementById(player.id)?.checked;
@@ -107,11 +103,24 @@ function updateVisuals(mainId, save, isInitial = false) {
     const player = playersData.find(p => p.id === mainId);
     const imgElement = document.getElementById(`img-display-${mainId}`);
     const nav = document.getElementById(`nav-${mainId}`);
+    const mainSwitch = document.getElementById(mainId);
 
     if (save) {
-        localStorage.setItem(mainId, document.getElementById(mainId).checked);
+        localStorage.setItem(mainId, mainSwitch.checked);
         if (mainId === "flora_base") localStorage.setItem("flora_armadura", document.getElementById("flora_armadura").checked);
         currentViewIndex[mainId] = 0;
+    }
+
+    // LÓGICA DEL INDICADOR "2" ROJO
+    // Buscamos si existe el indicador para este jugador
+    const indicator = document.getElementById(`ind-${mainId}`);
+    if (indicator) {
+        // Solo lo mostramos si el switch principal (Miximax) está activado
+        if (mainSwitch.checked) {
+            indicator.classList.add('visible');
+        } else {
+            indicator.classList.remove('visible');
+        }
     }
 
     const activeImages = getActiveImages(player);
@@ -168,8 +177,7 @@ function changeView(id, dir) {
 
 function handleToggle(id) { updateVisuals(id, true, false); }
 
-// --- MOTOR HEXADECIMAL ---
-
+// --- MOTOR HEXADECIMAL (Sin cambios) ---
 async function processAndDownload() {
     try {
         const res = await fetch(FILE_NAME);

@@ -1,22 +1,25 @@
 // data.js
 const playersData = [
     {
-        id: "flora_base",
+        id: "flora",
         name: "Flora",
         team: "Desesperdidos",
         imgBase: "img/player/3688_Flora.png",
         imgMiximax: "img/player/3934_Flora.png",
-        imgArmadura: "img/player/3934_FloraArm.png", // Imagen para cuando la armadura esté activa
-        hexOriginal: "6A 29 68 DF E6 88 13 A2 A1 F8 0D AF 00 00 00 00 00 00 00 00 00 00 00 00 DC FA 01",
-        hexModified: "6A 29 68 DF 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 64 14 02"
-    },
-    {
-        id: "flora_armadura",
-        name: "Flora (Armadura)",
-        team: "Desesperdidos",
-        isSubOption: true, // Esto evita que se cree una tarjeta nueva en el menú
-        hexOriginal: "1F 07 5C 7A 00 00 00 00 00 00 00 00 00 00 00 00 6A 29 68 DF 35 30 5C F8 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 DC FA 01",
-        hexModified: "1F 07 5C 7A 00 00 00 00 00 00 00 00 00 00 00 00 6A 29 68 DF 35 30 5C F8 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64 14 02"
+        imgArmadura: "img/player/3934_FloraArm.png",
+        // Miximax principal
+        hexOriginal: ["6A 29 68 DF E6 88 13 A2 A1 F8 0D AF 00 00 00 00 00 00 00 00 00 00 00 00 DC FA 01"],
+        hexModified: ["6A 29 68 DF 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 64 14 02"],
+        // Opciones extra dentro del mismo personaje
+        subOptions: [
+            {
+                id: "flora_armadura",
+                name: "ARMADURA",
+                img: "img/player/3934_FloraArm.png", // Imagen específica si se activa
+                hexOriginal: ["1F 07 5C 7A 00 00 00 00 00 00 00 00 00 00 00 00 6A 29 68 DF 35 30 5C F8 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 DC FA 01"],
+                hexModified: ["1F 07 5C 7A 00 00 00 00 00 00 00 00 00 00 00 00 6A 29 68 DF 35 30 5C F8 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64 14 02"]
+            }
+        ]
     },
     {
         id: "arion",
@@ -96,7 +99,24 @@ const playersData = [
         team: "Chrono Storm",
         imgBase: "img/player/2433_VictorBlade.png",
         imgMiximax: "img/player/3898_VictorBlade.png",
-        hexOriginal: "C0 D3 67 4A 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 74 B3 CB D5 33 C3 D5 D8 00 00 00 00 00 00 00 00 0A 00 00 00 3E 5A 01",
-        hexModified: "C0 D3 67 4A 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 10 BD 2B 9D 57 CD 35 90 00 00 00 00 00 00 00 00 00 00 00 00 EE 1A 02"
-    }
+        // Miximax base de Victor
+        hexOriginal: ["C0 D3 67 4A 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 74 B3 CB D5 33 C3 D5 D8 00 00 00 00 00 00 00 00 0A 00 00 00 3E 5A 01"],
+        hexModified: ["C0 D3 67 4A 00 00 00 00 00 00 00 00 00 00 00 00 DB 6E AC D6 74 B3 CB D5 33 C3 D5 D8 00 00 00 00 00 00 00 00 00 00 00 00 EC 4F 02"],
+        subOptions: [
+            {
+                id: "victor_idolos",
+                name: "ARM. ÍDOLOS",
+                img: "", // Usa la imagen del miximax al estar vacío
+                // Aquí van los dos bloques de los ídolos
+                hexOriginal: [
+                    "DD C0 9A FC 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 68 64 65 39 00 00 00 00 00 00 00 00 00 00 00 00 0A 00 00 00 3E 5A 01",
+                    "EA AA 58 FD 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 E8 1F 54 28 00 00 00 00 00 00 00 00 00 00 00 00 0A 00 00 00 3E 5A 01"
+                ],
+                hexModified: [
+                    "DD C0 9A FC 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 68 64 65 39 00 00 00 00 00 00 00 00 00 00 00 00 0A 00 00 00 EC 4F 02",
+                    "EA AA 58 FD 00 00 00 00 00 00 00 00 00 00 00 00 CB 5C 09 00 E8 1F 54 28 00 00 00 00 00 00 00 00 00 00 00 00 0A 00 00 00 EC 4F 02"
+                ]
+            }
+        ]
+    },
 ];

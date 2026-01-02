@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Inter:wght@400;500;700&display=swap');
 
 :root {
     --bg-deep: #05070f;
@@ -15,16 +15,14 @@ body {
     color: var(--text);
     font-family: 'Inter', sans-serif;
     margin: 0;
-    overflow-x: hidden;
     background-image: radial-gradient(rgba(0, 242, 255, 0.08) 1px, transparent 1px);
     background-size: 25px 25px;
     background-attachment: fixed;
 }
 
-/* --- HEADER --- */
 header {
     background: white;
-    padding: 10px 40px;
+    padding: 8px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -32,12 +30,11 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
 }
 
 .logo {
     font-family: var(--font-tech);
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     color: #002d55;
     font-weight: 700;
 }
@@ -46,17 +43,10 @@ header {
     color: var(--v-blue);
 }
 
-.author-link {
-    font-size: 0.75rem;
-    color: var(--v-blue);
-    text-decoration: none;
-    margin-left: 10px;
-}
-
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .btn-action {
@@ -65,136 +55,105 @@ header {
     cursor: pointer;
     font-weight: 700;
     text-transform: uppercase;
+    font-size: 0.75rem;
     transition: 0.2s;
-    font-size: 0.85rem;
 }
 
 .btn-action.main {
     background: linear-gradient(135deg, var(--v-blue), #003a99);
     color: white;
-    padding: 10px 25px;
+    padding: 8px 16px;
     clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
 }
 
 .btn-action.sub {
     background: #eef4f8;
     color: #002d55;
-    padding: 8px 15px;
-    border-radius: 2px;
+    padding: 6px 10px;
     border: 1px solid #d0deea;
+    border-radius: 2px;
 }
 
-.sep {
-    width: 1px;
-    height: 20px;
-    background: rgba(0, 0, 0, 0.1);
-    margin: 0 5px;
-}
-
-/* --- CONTENEDOR DE JUGADORES (Layout Centrado) --- */
+/* CONTENEDOR COMPACTO */
 #player-row-container {
     background: var(--bg-surface);
-    border: 1px solid rgba(0, 242, 255, 0.1);
     border-radius: 8px;
-    padding: 20px;
-    margin: 20px auto;
-    max-width: 1160px;
-    height: 360px;
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    margin: 15px auto;
+    max-width: 1100px;
+    height: 290px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Centra el título */
+    border: 1px solid rgba(0, 242, 255, 0.1);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 #active-team-title {
     font-family: var(--font-tech);
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     color: var(--v-cyan);
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
+    display: block !important;
 }
 
 .player-carousel {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     overflow-x: auto;
-    padding: 10px 20px;
     width: 100%;
-    /* Centra el contenido cuando no hay scroll */
     justify-content: safe center;
-    scroll-behavior: smooth;
+    padding: 5px 0;
 }
 
-.player-carousel::-webkit-scrollbar {
-    height: 6px;
-}
-
-.player-carousel::-webkit-scrollbar-thumb {
-    background: var(--v-blue);
-    border-radius: 3px;
-}
-
-/* --- TARJETA DE JUGADOR --- */
-@keyframes cardEntrance {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.9);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
+/* TARJETA */
 .player-card {
     background: #0a0e1a;
     border: 1px solid rgba(0, 242, 255, 0.2);
-    width: 185px;
-    height: 290px;
+    width: 175px;
+    /* Un pelín más ancha para acomodar los nuevos controles */
+    height: 230px;
     flex-shrink: 0;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: cardEntrance 0.4s ease backwards;
+    position: relative;
 }
 
+/* ZONA DE IMAGEN GRANDE */
 .card-img-top {
-    height: 140px;
+    height: 145px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
     position: relative;
     background: radial-gradient(circle at bottom, #151a30 0%, transparent 70%);
     overflow: hidden;
-    /* Importante para el efecto de hundirse */
 }
 
-/* Pedestal - Z-Index 5 para que el jugador se hunda detrás */
 .card-img-top::after {
     content: "";
     position: absolute;
     bottom: 0;
     width: 80%;
-    height: 3px;
+    height: 2px;
     background: var(--v-cyan);
-    filter: blur(4px);
-    opacity: 0.8;
-    box-shadow: 0 0 10px var(--v-cyan);
+    filter: blur(3px);
+    opacity: 0.6;
     z-index: 5;
 }
 
 .card-img-top img {
-    max-height: 130px;
+    max-height: 140px;
     width: auto;
     z-index: 2;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transition: opacity 0.25s, transform 0.25s;
     opacity: 0;
-    transform: translateY(20px);
-    /* Estado inicial: hundido */
+    transform: translateY(30px);
+    filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.5));
 }
 
 .img-visible {
@@ -204,25 +163,38 @@ header {
 
 .img-hidden {
     opacity: 0 !important;
-    transform: translateY(20px) !important;
+    transform: translateY(30px) !important;
 }
 
-/* Información */
+/* Indicador 2 Rojo */
+.indicator-modified {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-family: var(--font-tech);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ff2222;
+    z-index: 10;
+    text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff;
+    opacity: 0;
+    transition: 0.3s;
+    pointer-events: none;
+}
+
+.indicator-modified.visible {
+    opacity: 1 !important;
+}
+
+/* INFO AREA - Espaciado ajustado para controles más grandes */
 .card-info {
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.4);
-    height: 150px;
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.5);
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.card-name-container {
-    height: 32px;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .card-name {
@@ -231,83 +203,101 @@ header {
     color: var(--text-muted);
     text-transform: uppercase;
     text-align: center;
-    margin: 0;
+    margin: 0 0 8px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+/* FILA HORIZONTAL */
 .options-row {
     display: flex;
-    justify-content: space-around;
-    gap: 10px;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 8px;
+    /* Un poco más de separación entre controles */
 }
 
 .control-unit {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    flex: 1;
+    gap: 5px;
 }
 
+/* ETIQUETAS MÁS GRANDES Y LEGIBLES */
 .control-label {
     font-family: var(--font-tech);
-    font-size: 0.58rem;
+    font-size: 0.6rem;
+    /* Aumentado de 0.5rem */
     color: var(--v-cyan);
-    font-weight: 700;
-    text-align: center;
+    font-weight: 800;
+    /* Más grueso para mejor lectura */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/* Switch UI */
+/* SWITCH MÁS GRANDE Y ROBUSTO */
 .switch {
     position: relative;
-    width: 34px;
-    height: 16px;
+    width: 36px;
+    height: 18px;
+    display: block;
 }
 
+/* Aumentado de 30x14 a 36x18 */
 .switch input {
-    display: none;
+    display: none !important;
+    visibility: hidden;
+    appearance: none;
 }
 
 .slider {
     position: absolute;
     cursor: pointer;
     inset: 0;
-    background-color: #080a12;
-    border: 1px solid rgba(0, 242, 255, 0.3);
+    background: #080a12;
+    border: 1px solid rgba(0, 242, 255, 0.4);
     transition: .3s;
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
+/* BOTÓN DESLIZANTE MÁS GRANDE */
 .slider:before {
     content: "";
     position: absolute;
-    height: 10px;
-    width: 4px;
+    height: 12px;
+    width: 6px;
+    /* Más alto y ancho */
     left: 4px;
     bottom: 2px;
+    /* Posición ajustada */
     background: #3a4558;
-    transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: .3s;
+    border-radius: 1px;
 }
 
 input:checked+.slider {
     border-color: var(--v-cyan);
-    background: rgba(0, 242, 255, 0.1);
+    background: rgba(0, 242, 255, 0.15);
 }
 
 input:checked+.slider:before {
-    transform: translateX(18px);
-    background-color: var(--v-cyan);
-    box-shadow: 0 0 8px var(--v-cyan);
+    transform: translateX(20px);
+    background: var(--v-cyan);
+    box-shadow: 0 0 6px var(--v-cyan);
 }
 
-/* --- EQUIPOS (Cuadrícula Centrada) --- */
+/* SECCIÓN EQUIPOS */
 .section-label {
     font-family: var(--font-tech);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #fff;
-    margin: 30px 0 20px 0;
+    margin: 20px 0 15px 0;
     text-transform: uppercase;
-    letter-spacing: 3px;
-    display: flex;
+    letter-spacing: 2px;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     gap: 15px;
@@ -319,7 +309,6 @@ input:checked+.slider:before {
     flex: 1;
     height: 2px;
     background: linear-gradient(90deg, transparent, var(--v-cyan));
-    box-shadow: 0 0 10px rgba(0, 242, 255, 0.4);
 }
 
 .section-label::after {
@@ -328,95 +317,75 @@ input:checked+.slider:before {
 
 .team-selection-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 20px;
-    max-width: 1160px;
-    margin: 0 auto 50px;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 15px;
+    max-width: 1100px;
+    margin: 0 auto 30px;
     justify-content: center;
 }
 
 .team-box {
     aspect-ratio: 1/1;
     background: rgba(15, 20, 35, 0.8);
-    border: 2px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 15px;
-    transition: 0.3s;
+    padding: 12px;
+    transition: 0.2s;
 }
 
 .team-box img {
     width: 90%;
     height: 90%;
     object-fit: contain;
-    filter: grayscale(0.5);
+    filter: grayscale(0.7);
 }
 
 .team-box.selected {
     border-color: var(--v-cyan);
-    background: rgba(0, 242, 255, 0.05);
-    box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+    background: rgba(0, 242, 255, 0.1);
 }
 
 .team-box.selected img {
-    filter: grayscale(0) drop-shadow(0 0 10px var(--v-cyan));
+    filter: grayscale(0);
 }
 
+/* FLECHAS DISCRETAS (ESTILO FANTASMA) */
 .img-nav {
     position: absolute;
-    top: 40%;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 0 5px;
-    box-sizing: border-box;
-    z-index: 10;
+    align-items: center;
     pointer-events: none;
+    z-index: 20;
 }
 
 .img-nav button {
     pointer-events: auto;
-    background: rgba(0, 242, 255, 0.2);
-    border: 1px solid var(--v-cyan);
-    color: white;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
+    background: transparent;
+    border: none;
+    color: var(--v-cyan);
+    font-size: 2rem;
+    padding: 0 10px;
+    height: 100%;
     cursor: pointer;
-    font-size: 10px;
-}
-
-/* --- INDICADOR DE MODIFICACIÓN OCULTA (El "2" Rojo) --- */
-.indicator-modified {
-    position: absolute;
-    bottom: 15px;
-    /* Ajustado para que no pise el pedestal */
-    right: 15px;
-    font-family: var(--font-tech);
-    font-size: 1.8rem;
-    /* Tamaño grande y visible */
-    font-weight: 700;
-    color: #ff2222;
-    /* Rojo intenso */
-    /* Truco para simular borde blanco alrededor del texto */
-    text-shadow:
-        2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff,
-        1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
-    z-index: 10;
-    /* Por encima de todo, incluido el pedestal */
     opacity: 0;
-    /* Oculto por defecto */
-    transform: scale(0.8);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    pointer-events: none;
-    /* Para que no moleste al hacer click */
+    transition: 0.3s;
+    text-shadow: 0 0 5px var(--v-cyan);
 }
 
-/* Clase para mostrarlo cuando el switch está activo */
-.indicator-modified.visible {
-    opacity: 1;
-    transform: scale(1);
+.player-card:hover .img-nav button {
+    opacity: 0.3;
+}
+
+.img-nav button:hover {
+    opacity: 1 !important;
+    transform: scale(1.1);
 }

@@ -1,7 +1,3 @@
-/**
- * CONFIGURACIÓN DE REPOSITORIO
- * Asegúrate de que estos nombres coincidan con tu cuenta de GitHub
- */
 const GITHUB_USER = "tu_usuario";
 const GITHUB_REPO = "tu_repo";
 let detectedFileName = "chara_model_1.03.49.00.cfg.bin";
@@ -9,148 +5,101 @@ let detectedFileName = "chara_model_1.03.49.00.cfg.bin";
 const currentViewIndex = {};
 let selectedTeam = null;
 
-// --- 1. RECARGA DE EMERGENCIA ---
-function forceCacheReload() {
-    const cleanUrl = window.location.origin + window.location.pathname;
-    window.location.replace(cleanUrl + '?reload=' + new Date().getTime());
-}
-
-// --- 2. DETECCIÓN AUTOMÁTICA DEL ARCHIVO .BIN ---
 async function autoDetectFile() {
     try {
-        const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`;
-        const res = await fetch(apiUrl);
-        if (!res.ok) return;
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
         const files = await res.json();
-        const target = files.find(f =>
-            f.name.toLowerCase().startsWith("chara_model") &&
-            f.name.toLowerCase().endsWith(".bin")
-        );
-        if (target) {
-            detectedFileName = target.name;
-            console.log("Archivo detectado:", detectedFileName);
-        }
-    } catch (e) {
-        console.warn("API de GitHub no disponible, usando nombre base.");
-    }
+        const target = files.find(f => f.name.toLowerCase().startsWith("chara_model") && f.name.toLowerCase().endsWith(".bin"));
+        if (target) detectedFileName = target.name;
+    } catch (e) { console.warn("Detección fallida."); }
 }
 
-// --- 3. INICIALIZADOR PRINCIPAL ---
-async function startEditor() {
-    console.log("Iniciando Editor...");
+function forceCacheReload() {
+    window.location.replace(window.location.origin + window.location.pathname + '?r=' + new Date().getTime());
+}
 
-    // Esperamos a que el .bin sea detectado
+async function init() {
     await autoDetectFile();
-
-    // Verificamos si los datos existen
-    if (typeof playersData === 'undefined') {
-        console.error("CRÍTICO: No se ha encontrado 'playersData'. Revisa que data.js no tenga errores de sintaxis.");
-        alert("Error: No se pudieron cargar los datos de los jugadores.");
-        return;
-    }
-
-    renderTeamSelection();
+    if (typeof playersData !== 'undefined') renderTeamSelection();
 }
 
-// --- 4. RENDERIZADO DE EQUIPOS ---
 function renderTeamSelection() {
     const grid = document.getElementById('team-grid');
     if (!grid) return;
-
-    // Obtenemos equipos únicos y ordenamos alfabéticamente
-    let teams = [...new Set(playersData.filter(p => !p.isSubOption).map(p => p.team))];
-    teams.sort((a, b) => a.localeCompare(b));
-
-    grid.innerHTML = teams.map(teamName => {
-        const teamId = teamName.replace(/\s/g, '');
-        return `
-            <div class="team-box" id="box-${teamId}" onclick="selectTeam('${teamName}')" title="${teamName}">
-                <img src="img/team/${teamId}.png" onerror="this.src='img/team/default.png'">
-            </div>
-        `;
+    let teams = [...new Set(playersData.map(p => p.team))].sort((a, b) => a.localeCompare(b));
+    grid.innerHTML = teams.map(t => {
+        const id = t.replace(/\s/g, '');
+        return `<div class="team-box" id="box-${id}" onclick="selectTeam('${t}')">
+                    <img src="img/team/${id}.png" onerror="this.src='img/team/default.png'">
+                </div>`;
     }).join('');
-
-    console.log("Equipos renderizados:", teams.length);
 }
 
-function selectTeam(teamName) {
+function selectTeam(t) {
     document.querySelectorAll('.team-box').forEach(b => b.classList.remove('selected'));
-    const teamId = teamName.replace(/\s/g, '');
-    const box = document.getElementById(`box-${teamId}`);
-    if (box) box.classList.add('selected');
-
-    selectedTeam = teamName;
-    document.getElementById('active-team-title').innerHTML = `EQUIPO: <span style="color: #fff">${teamName.toUpperCase()}</span>`;
-    renderPlayerRow(teamName);
+    const id = t.replace(/\s/g, '');
+    if (document.getElementById(`box-${id}`)) document.getElementById(`box-${id}`).classList.add('selected');
+    selectedTeam = t;
+    document.getElementById('active-team-title').innerHTML = `EQUIPO: <span style="color: #fff">${t.toUpperCase()}</span>`;
+    renderPlayerRow(t);
 }
 
-// --- 5. RENDERIZADO JUGADORES (ORDEN NUMÉRICO + INDICADOR 2) ---
-function getPlayerNumber(path) {
-    const filename = path.split('/').pop();
-    const match = filename.match(/^\d+/);
-    return match ? parseInt(match[0]) : 999999;
-}
-
-function renderPlayerRow(teamName) {
+function renderPlayerRow(t) {
     const row = document.getElementById('player-row');
-    let filtered = playersData.filter(p => p.team === teamName && !p.isSubOption);
+    let filtered = playersData.filter(p => p.team === t).sort((a, b) => {
+        const nA = a.imgBase.split('/').pop().match(/^\d+/);
+        const nB = b.imgBase.split('/').pop().match(/^\d+/);
+        return (nA ? parseInt(nA[0]) : 999) - (nB ? parseInt(nB[0]) : 999);
+    });
 
-    // Ordenamos por el número de la imagen
-    filtered.sort((a, b) => getPlayerNumber(a.imgBase) - getPlayerNumber(b.imgBase));
+    row.innerHTML = filtered.map((p, i) => {
+        const isMix = localStorage.getItem(p.id) === 'true';
+        currentViewIndex[p.id] = 0;
+        const subHTML = (p.subOptions || []).map(s => {
+            const isSub = localStorage.getItem(s.id) === 'true';
+            return `<div class="control-unit">
+                <label class="switch"><input type="checkbox" id="${s.id}" ${isSub ? 'checked' : ''} onchange="handleToggle('${p.id}')"><span class="slider"></span></label>
+                <span class="control-label">${s.name}</span>
+            </div>`;
+        }).join('');
 
-    row.innerHTML = filtered.map((player, index) => {
-        const isChecked = localStorage.getItem(player.id) === 'true';
-        currentViewIndex[player.id] = 0;
+        const isSame = (p.imgBase === p.imgMiximax) && p.imgMiximax;
 
-        const hasSameImg = (player.imgBase === player.imgMiximax) && player.imgMiximax;
-        const indicator = hasSameImg ? `<span class="indicator-modified" id="ind-${player.id}">2</span>` : '';
-
-        return `
-        <div class="player-card" id="card-${player.id}" style="animation-delay: ${index * 0.05}s">
+        return `<div class="player-card" id="card-${p.id}" style="animation-delay: ${i * 0.04}s">
             <div class="card-img-top">
-                ${indicator}
-                <div class="img-nav" id="nav-${player.id}" style="display:none">
-                    <button onclick="changeView('${player.id}', -1)">❮</button>
-                    <button onclick="changeView('${player.id}', 1)">❯</button>
+                ${isSame ? `<span class="indicator-modified" id="ind-${p.id}">2</span>` : ''}
+                <div class="img-nav" id="nav-${p.id}" style="display:none">
+                    <button onclick="changeView('${p.id}', -1)">❮</button>
+                    <button onclick="changeView('${p.id}', 1)">❯</button>
                 </div>
-                <img src="${player.imgBase}" id="img-display-${player.id}">
+                <img src="${p.imgBase}" id="img-display-${p.id}">
             </div>
             <div class="card-info">
-                <div class="card-name-container"><h3 class="card-name">${player.name}</h3></div>
+                <h3 class="card-name">${p.name}</h3>
                 <div class="options-row">
                     <div class="control-unit">
-                        <label class="switch">
-                            <input type="checkbox" id="${player.id}" ${isChecked ? 'checked' : ''} onchange="handleToggle('${player.id}')">
-                            <span class="slider"></span>
-                        </label>
+                        <label class="switch"><input type="checkbox" id="${p.id}" ${isMix ? 'checked' : ''} onchange="handleToggle('${p.id}')"><span class="slider"></span></label>
                         <span class="control-label">MIXIMAX</span>
                     </div>
-                    ${player.id === "flora_base" ? `
-                    <div class="control-unit">
-                        <label class="switch">
-                            <input type="checkbox" id="flora_armadura" ${localStorage.getItem("flora_armadura") === 'true' ? 'checked' : ''} onchange="handleToggle('flora_base')">
-                            <span class="slider"></span>
-                        </label>
-                        <span class="control-label">ARMADURA</span>
-                    </div>` : ''}
+                    ${subHTML}
                 </div>
             </div>
         </div>`;
     }).join('');
-
     filtered.forEach(p => updateVisuals(p.id, false, true));
 }
 
-// --- 6. GESTIÓN DE IMÁGENES ---
-function getActiveImages(player) {
-    let images = [];
-    const mix = document.getElementById(player.id)?.checked;
-    if (player.id === "flora_base") {
-        const arm = document.getElementById("flora_armadura")?.checked;
-        if (mix) images.push(player.imgMiximax);
-        if (arm) images.push(player.imgArmadura);
-    } else { if (mix) images.push(player.imgMiximax); }
-    return images.length > 0 ? images : [player.imgBase];
+function getActiveImages(p) {
+    let versions = [];
+    if (document.getElementById(p.id)?.checked && p.imgMiximax) versions.push(p.imgMiximax);
+    (p.subOptions || []).forEach(s => {
+        if (document.getElementById(s.id)?.checked) {
+            if (s.img && s.img !== "") versions.push(s.img);
+            else if (p.imgMiximax) versions.push(p.imgMiximax);
+        }
+    });
+    let unique = [...new Set(versions)];
+    return unique.length > 0 ? unique : [p.imgBase];
 }
 
 function updateVisuals(id, save, initial = false) {
@@ -158,20 +107,20 @@ function updateVisuals(id, save, initial = false) {
     const img = document.getElementById(`img-display-${id}`);
     const nav = document.getElementById(`nav-${id}`);
     const sw = document.getElementById(id);
-    if (!img) return;
 
     if (save) {
         localStorage.setItem(id, sw.checked);
-        if (id === "flora_base") localStorage.setItem("flora_armadura", document.getElementById("flora_armadura").checked);
-        currentViewIndex[id] = 0;
+        (p.subOptions || []).forEach(s => localStorage.setItem(s.id, document.getElementById(s.id).checked));
     }
 
     const ind = document.getElementById(`ind-${id}`);
     if (ind) sw.checked ? ind.classList.add('visible') : ind.classList.remove('visible');
 
-    const active = getActiveImages(p);
-    if (nav) nav.style.display = active.length > 1 ? "flex" : "none";
-    const src = active[currentViewIndex[id] || 0];
+    const list = getActiveImages(p);
+    if (nav) nav.style.display = list.length >= 2 ? "flex" : "none";
+    if (currentViewIndex[id] >= list.length) currentViewIndex[id] = 0;
+
+    const src = list[currentViewIndex[id]];
 
     if (initial) {
         img.src = src;
@@ -179,59 +128,69 @@ function updateVisuals(id, save, initial = false) {
     } else {
         img.classList.remove('img-visible');
         img.classList.add('img-hidden');
-        const p1 = new Promise(r => setTimeout(r, 250));
-        const p2 = new Promise(r => { const t = new Image(); t.onload = r; t.src = src; });
-        Promise.all([p1, p2]).then(() => {
+        setTimeout(() => {
             img.src = src;
             img.classList.remove('img-hidden');
             img.classList.add('img-visible');
-        });
+        }, 250);
     }
 }
 
 function changeView(id, dir) {
     const p = playersData.find(x => x.id === id);
-    const active = getActiveImages(p);
-    const img = document.getElementById(`img-display-${id}`);
-    const next = (currentViewIndex[id] + dir + active.length) % active.length;
-
-    img.classList.remove('img-visible');
-    img.classList.add('img-hidden');
-    const p1 = new Promise(r => setTimeout(r, 250));
-    const p2 = new Promise(r => { const t = new Image(); t.onload = r; t.src = active[next]; });
-
-    Promise.all([p1, p2]).then(() => {
-        currentViewIndex[id] = next;
-        img.src = active[next];
-        img.classList.remove('img-hidden');
-        img.classList.add('img-visible');
-    });
+    const list = getActiveImages(p);
+    currentViewIndex[id] = (currentViewIndex[id] + dir + list.length) % list.length;
+    updateVisuals(id, false, false);
 }
 
 function handleToggle(id) { updateVisuals(id, true, false); }
 
-// --- 7. PROCESAMIENTO BINARIO ---
+// --- FUNCIÓN CORREGIDA PARA EVITAR EL ERROR .forEach ---
 async function processAndDownload() {
     try {
         const res = await fetch(detectedFileName + '?v=' + new Date().getTime());
-        if (!res.ok) throw new Error("No se pudo cargar el archivo base .bin");
         const buf = await res.arrayBuffer();
         let data = new Uint8Array(buf);
+
         playersData.forEach(p => {
-            const el = document.getElementById(p.id) || { checked: localStorage.getItem(p.id) === 'true' };
-            const act = el.checked;
-            const sH = act ? p.hexOriginal : p.hexModified;
-            const rH = act ? p.hexModified : p.hexOriginal;
-            if (sH && rH && !sH.includes("HEX_")) data = replace(data, sH, rH);
+            // Miximax Principal
+            const mAct = (document.getElementById(p.id)?.checked || localStorage.getItem(p.id) === 'true');
+
+            // Convertimos a lista si es un texto solo para que el .forEach funcione siempre
+            const hOrig = Array.isArray(p.hexOriginal) ? p.hexOriginal : [p.hexOriginal];
+            const hMod = Array.isArray(p.hexModified) ? p.hexModified : [p.hexModified];
+
+            hOrig.forEach((orig, i) => {
+                const mod = hMod[i];
+                if (orig && mod) {
+                    data = replace(data, mAct ? orig : mod, mAct ? mod : orig);
+                }
+            });
+
+            // Sub-opciones (Armaduras)
+            (p.subOptions || []).forEach(s => {
+                const sAct = (document.getElementById(s.id)?.checked || localStorage.getItem(s.id) === 'true');
+
+                const shOrig = Array.isArray(s.hexOriginal) ? s.hexOriginal : [s.hexOriginal];
+                const shMod = Array.isArray(s.hexModified) ? s.hexModified : [s.hexModified];
+
+                shOrig.forEach((orig, i) => {
+                    const mod = shMod[i];
+                    if (orig && mod) {
+                        data = replace(data, sAct ? orig : mod, sAct ? mod : orig);
+                    }
+                });
+            });
         });
-        const b = new Blob([data], { type: "application/octet-stream" });
-        const u = URL.createObjectURL(b);
-        const a = document.createElement('a'); a.href = u; a.download = detectedFileName; a.click();
-    } catch (e) { alert(e.message); }
+
+        const blob = new Blob([data], { type: "application/octet-stream" });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = detectedFileName; a.click();
+    } catch (e) { alert("Error: " + e.message); }
 }
 
 function replace(data, sH, rH) {
     const sB = hexToB(sH), rB = hexToB(rH);
+    if (sH === rH) return data;
     for (let i = 0; i <= data.length - sB.length; i++) {
         let m = true;
         for (let j = 0; j < sB.length; j++) if (data[i + j] !== sB[j]) { m = false; break; }
@@ -241,30 +200,31 @@ function replace(data, sH, rH) {
 }
 
 function hexToB(h) {
-    const c = h.replace(/\s+/g, '');
+    const clean = h.replace(/\s+/g, '');
     let b = [];
-    for (let i = 0; i < c.length; i += 2) b.push(parseInt(c.substr(i, 2), 16));
+    for (let i = 0; i < clean.length; i += 2) b.push(parseInt(clean.substr(i, 2), 16));
     return new Uint8Array(b);
 }
 
 function saveConfig() {
     let c = {};
-    playersData.forEach(p => { c[p.id] = (localStorage.getItem(p.id) === 'true'); });
+    playersData.forEach(p => {
+        c[p.id] = (localStorage.getItem(p.id) === 'true');
+        (p.subOptions || []).forEach(s => c[s.id] = (localStorage.getItem(s.id) === 'true'));
+    });
     const b = new Blob([JSON.stringify(c, null, 2)], { type: "text/plain" });
-    const u = URL.createObjectURL(b);
-    const a = document.createElement('a'); a.href = u; a.download = "config_miximax.txt"; a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "config.txt"; a.click();
 }
 
 function loadConfig(e) {
     const r = new FileReader();
     r.onload = (ev) => {
         const c = JSON.parse(ev.target.result);
-        for (const id in c) { localStorage.setItem(id, c[id]); }
+        for (const id in c) localStorage.setItem(id, c[id]);
         if (selectedTeam) renderPlayerRow(selectedTeam);
-        alert("Configuración cargada.");
+        alert("Cargado");
     };
     r.readAsText(e.target.files[0]);
 }
 
-// LANZAMIENTO
-startEditor();
+init();

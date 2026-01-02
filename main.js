@@ -2,20 +2,20 @@ const FILE_NAME = "chara_model_1.03.49.00.cfg";
 const currentViewIndex = {};
 let selectedTeam = null;
 
-// FUNCIÓN PARA LIMPIAR CACHÉ (Header)
+// FUNCIÓN PARA LIMPIAR CACHÉ
 function forceCacheReload() {
     const cleanUrl = window.location.origin + window.location.pathname;
     window.location.href = cleanUrl + '?update=' + new Date().getTime();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    renderTeamSelection();
-});
+document.addEventListener('DOMContentLoaded', () => { renderTeamSelection(); });
 
 // --- LÓGICA DE EQUIPOS ---
 function renderTeamSelection() {
     const grid = document.getElementById('team-grid');
     let teams = [...new Set(playersData.filter(p => !p.isSubOption).map(p => p.team))];
+
+    // Orden alfabético de equipos
     teams.sort((a, b) => a.localeCompare(b));
 
     grid.innerHTML = teams.map(teamName => {
@@ -36,10 +36,20 @@ function selectTeam(teamName) {
     renderPlayerRow(teamName);
 }
 
-// --- RENDERIZADO JUGADORES ---
+// --- LÓGICA DE ORDENACIÓN DE JUGADORES ---
+function getPlayerNumber(path) {
+    // Extrae el número del nombre del archivo (ej: "3662" de "img/players/3662_Wolfram.png")
+    const filename = path.split('/').pop();
+    const match = filename.match(/^\d+/);
+    return match ? parseInt(match[0]) : 999999;
+}
+
 function renderPlayerRow(teamName) {
     const row = document.getElementById('player-row');
-    const filteredPlayers = playersData.filter(p => p.team === teamName && !p.isSubOption);
+    let filteredPlayers = playersData.filter(p => p.team === teamName && !p.isSubOption);
+
+    // ORDENAR SEGÚN NÚMERO DE IMAGEN
+    filteredPlayers.sort((a, b) => getPlayerNumber(a.imgBase) - getPlayerNumber(b.imgBase));
 
     row.innerHTML = filteredPlayers.map((player, index) => {
         const isChecked = localStorage.getItem(player.id) === 'true';
@@ -80,6 +90,8 @@ function renderPlayerRow(teamName) {
     filteredPlayers.forEach(p => updateVisuals(p.id, false, true));
 }
 
+// --- GESTIÓN VISUAL (Pre-carga e Inmersión) ---
+
 function getActiveImages(player) {
     let images = [];
     const checkMiximax = document.getElementById(player.id)?.checked;
@@ -91,7 +103,6 @@ function getActiveImages(player) {
     return images.length > 0 ? images : [player.imgBase];
 }
 
-// --- FUNCIÓN CORE: ACTUALIZAR VISUALES CON PRECARGA ---
 function updateVisuals(mainId, save, isInitial = false) {
     const player = playersData.find(p => p.id === mainId);
     const imgElement = document.getElementById(`img-display-${mainId}`);
@@ -111,22 +122,18 @@ function updateVisuals(mainId, save, isInitial = false) {
         imgElement.src = targetSrc;
         setTimeout(() => imgElement.classList.add('img-visible'), 100);
     } else {
-        // 1. Iniciar animación de bajada
         imgElement.classList.remove('img-visible');
         imgElement.classList.add('img-hidden');
 
-        // 2. Crear promesas para sincronizar animación y carga
-        const animationPromise = new Promise(resolve => setTimeout(resolve, 250)); // Espera mínima de la animación CSS
-        const imageLoadPromise = new Promise((resolve) => {
-            const tempImg = new Image();
-            tempImg.onload = () => resolve(); // Se resuelve cuando la imagen se descarga
-            tempImg.onerror = () => resolve(); // Se resuelve incluso si falla para no bloquear
-            tempImg.src = targetSrc; // Empieza a descargar
+        const animationPromise = new Promise(resolve => setTimeout(resolve, 250));
+        const imageLoadPromise = new Promise(resolve => {
+            const temp = new Image();
+            temp.onload = () => resolve();
+            temp.onerror = () => resolve();
+            temp.src = targetSrc;
         });
 
-        // 3. Esperar a que AMBAS cosas terminen
         Promise.all([animationPromise, imageLoadPromise]).then(() => {
-            // Solo ahora cambiamos la fuente y subimos
             imgElement.src = targetSrc;
             imgElement.classList.remove('img-hidden');
             imgElement.classList.add('img-visible');
@@ -134,29 +141,23 @@ function updateVisuals(mainId, save, isInitial = false) {
     }
 }
 
-// --- FUNCIÓN CORE: CAMBIAR VISTA (FLECHAS) CON PRECARGA ---
 function changeView(id, dir) {
     const player = playersData.find(p => p.id === id);
     const activeImages = getActiveImages(player);
     const imgElement = document.getElementById(`img-display-${id}`);
-
-    // Calcular nuevo índice
     const newIndex = (currentViewIndex[id] + dir + activeImages.length) % activeImages.length;
     const targetSrc = activeImages[newIndex];
 
-    // 1. Iniciar animación de bajada
     imgElement.classList.remove('img-visible');
     imgElement.classList.add('img-hidden');
 
-    // 2. Promesas de sincronización
     const animationPromise = new Promise(resolve => setTimeout(resolve, 250));
-    const imageLoadPromise = new Promise((resolve) => {
-        const tempImg = new Image();
-        tempImg.onload = () => resolve();
-        tempImg.src = targetSrc;
+    const imageLoadPromise = new Promise(resolve => {
+        const temp = new Image();
+        temp.onload = () => resolve();
+        temp.src = targetSrc;
     });
 
-    // 3. Esperar y ejecutar subida
     Promise.all([animationPromise, imageLoadPromise]).then(() => {
         currentViewIndex[id] = newIndex;
         imgElement.src = targetSrc;
@@ -167,11 +168,12 @@ function changeView(id, dir) {
 
 function handleToggle(id) { updateVisuals(id, true, false); }
 
-// --- MOTOR HEX (Sin cambios) ---
+// --- MOTOR HEXADECIMAL ---
+
 async function processAndDownload() {
     try {
         const res = await fetch(FILE_NAME);
-        if (!res.ok) throw new Error(`Archivo ${FILE_NAME} no encontrado.`);
+        if (!res.ok) throw new Error("Archivo .bin no encontrado.");
         const buffer = await res.arrayBuffer();
         let data = new Uint8Array(buffer);
         playersData.forEach(p => {

@@ -24,7 +24,7 @@ body {
 /* --- HEADER --- */
 header {
     background: white;
-    padding: 10px 30px;
+    padding: 10px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -56,7 +56,7 @@ header {
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .btn-action {
@@ -66,37 +66,32 @@ header {
     font-weight: 700;
     text-transform: uppercase;
     transition: 0.2s;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
 }
 
 .btn-action.main {
     background: linear-gradient(135deg, var(--v-blue), #003a99);
     color: white;
-    padding: 10px 20px;
+    padding: 10px 25px;
     clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
 }
 
 .btn-action.sub {
     background: #eef4f8;
     color: #002d55;
-    padding: 8px 12px;
+    padding: 8px 15px;
     border-radius: 2px;
     border: 1px solid #d0deea;
-}
-
-.btn-action.sub:hover {
-    background: var(--v-cyan);
-    border-color: var(--v-blue);
 }
 
 .sep {
     width: 1px;
     height: 20px;
     background: rgba(0, 0, 0, 0.1);
-    margin: 0 2px;
+    margin: 0 5px;
 }
 
-/* --- CONTENEDOR DE JUGADORES (Altura Fija) --- */
+/* --- CONTENEDOR DE JUGADORES (Layout Centrado) --- */
 #player-row-container {
     background: var(--bg-surface);
     border: 1px solid rgba(0, 242, 255, 0.1);
@@ -104,26 +99,41 @@ header {
     padding: 20px;
     margin: 20px auto;
     max-width: 1160px;
-    height: 350px;
+    height: 360px;
     box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
+    align-items: center;
+    /* Centra el título */
 }
 
 #active-team-title {
     font-family: var(--font-tech);
     font-size: 1.3rem;
     color: var(--v-cyan);
-    margin-bottom: 10px;
-    text-align: center;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .player-carousel {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     overflow-x: auto;
-    padding: 10px 5px;
-    flex-grow: 1;
+    padding: 10px 20px;
+    width: 100%;
+    /* Centra el contenido cuando no hay scroll */
+    justify-content: safe center;
+    scroll-behavior: smooth;
+}
+
+.player-carousel::-webkit-scrollbar {
+    height: 6px;
+}
+
+.player-carousel::-webkit-scrollbar-thumb {
+    background: var(--v-blue);
+    border-radius: 3px;
 }
 
 /* --- TARJETA DE JUGADOR --- */
@@ -143,7 +153,7 @@ header {
     background: #0a0e1a;
     border: 1px solid rgba(0, 242, 255, 0.2);
     width: 185px;
-    height: 285px;
+    height: 290px;
     flex-shrink: 0;
     border-radius: 4px;
     display: flex;
@@ -160,9 +170,10 @@ header {
     position: relative;
     background: radial-gradient(circle at bottom, #151a30 0%, transparent 70%);
     overflow: hidden;
+    /* Importante para el efecto de hundirse */
 }
 
-/* Pedestal - Z-Index 5 para tapar pies */
+/* Pedestal - Z-Index 5 para que el jugador se hunda detrás */
 .card-img-top::after {
     content: "";
     position: absolute;
@@ -180,9 +191,10 @@ header {
     max-height: 130px;
     width: auto;
     z-index: 2;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.25s ease, transform 0.25s ease;
     opacity: 0;
     transform: translateY(20px);
+    /* Estado inicial: hundido */
 }
 
 .img-visible {
@@ -199,7 +211,7 @@ header {
 .card-info {
     padding: 10px;
     background: rgba(0, 0, 0, 0.4);
-    height: 145px;
+    height: 150px;
     display: flex;
     flex-direction: column;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -287,7 +299,7 @@ input:checked+.slider:before {
     box-shadow: 0 0 8px var(--v-cyan);
 }
 
-/* --- EQUIPOS --- */
+/* --- EQUIPOS (Cuadrícula Centrada) --- */
 .section-label {
     font-family: var(--font-tech);
     font-size: 1.2rem;
@@ -320,6 +332,7 @@ input:checked+.slider:before {
     gap: 20px;
     max-width: 1160px;
     margin: 0 auto 50px;
+    justify-content: center;
 }
 
 .team-box {
